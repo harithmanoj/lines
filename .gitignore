@@ -1,0 +1,10 @@
+#---------------------------------------------------
+
+#Binaries
+/bin
+
+#visual studio files
+/.vs
+/int
+/vsproject
+
