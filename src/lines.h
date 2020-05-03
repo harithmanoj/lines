@@ -34,6 +34,9 @@
 // so as not to pollute the global space
 namespace lines
 {
+
+	const constexpr char* version_lines = "v1.0.1";
+
 	namespace fs = std::filesystem;
 	using fs::path;
 
@@ -127,7 +130,7 @@ namespace lines
 		std::cout << "\n-----------------------------------------------------------------------------\n";
 		std::cout << "\n\nProgram to count lines\n\n";
 		std::cout << " \t\t Open source project hosted at github\n\n";
-		std::cout << " \t\t\tVersion 1.0.0.1\n";
+		std::cout << " \t\t\tVersion " << version_lines << "\n";
 		std::cout << "\n-----------------------------------------------------------------------------\n";
 	}
 
