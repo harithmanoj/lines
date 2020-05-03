@@ -2,7 +2,7 @@ lines
 ===================
 
 lines is free and open source program that counts all lines of files. 
-[GPL License](LICENSE.md).
+[GPL License](License.md).
 
 Build lines
 ---------------
@@ -14,5 +14,5 @@ Ensure that lines.h is in the same directory as main.cpp, also minimum c++17 is 
 Contribution
 ------------
 
-Code contribution is welcome. Here are some [ways](CONTRIBUTING.md) that you can contribute to this project.
+Code contribution is welcome. Here are some [ways](Contributing.md) that you can contribute to this project.
 
