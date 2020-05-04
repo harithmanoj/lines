@@ -54,3 +54,91 @@ lines::directory lines::getFileStructure(path element, bool recursive, std::vect
 	}
 	return ret;
 }
+
+bool lines::check_string(const std::string& in, LineCount& info, bool prev_state)
+{
+	auto beg = in.find_first_not_of(" \t\n\v\f\r"); //begining discarding whitespace
+	auto end = in.find_last_not_of(" \t\n\v\f\r"); //ending discarding whitespace
+	++info.total; //total line is incremented either way
+
+	if (beg == std::string::npos)
+		return prev_state;
+
+	if (prev_state) //if multi line comment is active
+	{
+		auto previous_comment_end = in.find_first_of('*'); // find end of comment
+		auto prev_cmnt_end = in.find_first_of('/', previous_comment_end);
+		if (previous_comment_end != std::string::npos)
+			if (prev_cmnt_end != std::string::npos)
+				if (previous_comment_end == prev_cmnt_end - 1)
+				{
+					if (prev_cmnt_end == end)
+						return false;
+					else
+					{
+						++info.stripped;
+						return false;
+					}
+				}
+		return true;
+	}
+
+	auto comment_single_beg = in.find_first_of('/');
+	auto comment_single_end = in.find_first_of('/', comment_single_beg + 1);
+	if (comment_single_beg != std::string::npos) // if single line commet found in begining, no code
+		if (comment_single_end != std::string::npos)
+			if (comment_single_end == comment_single_beg + 1)
+				if (comment_single_beg == beg)
+					return false;
+
+	auto multi_line_beg_b = in.find_first_of('/'); // get multi-line start position
+	auto multi_line_beg_e = in.find_first_of('*', multi_line_beg_b);
+
+	if (multi_line_beg_b != std::string::npos) // if it exists
+		if (multi_line_beg_e != std::string::npos)
+			if (multi_line_beg_e == multi_line_beg_b + 1)
+			{
+				if (multi_line_beg_b != beg)
+					++info.stripped; //increments actual code line count if not begining
+
+				return true; // regardless of code multi line comment is active
+			}
+
+	++info.stripped; // else actual code exists
+	return false;
+}
+
+void lines::count_file_lines(LineCount& count)
+{
+	if (count.component.empty())
+		throw std::invalid_argument("empty path");
+	if (!fs::is_directory(count.component))
+		throw std::invalid_argument("argument must be directory");
+
+	std::ifstream file(count.component);
+
+	std::string input;
+	bool comment = false;
+	std::getline(file, input);
+	while (!file.eof())
+	{
+		comment = check_string(input, count, comment);
+		std::getline(file, input);
+	}
+}
+
+
+void lines::count_directory_r(directory& dir)
+{
+	for (auto& i : dir.files)
+	{
+		count_file_lines(i);
+		dir.current += i;
+	}
+
+	for (auto& i : dir.dirs)
+	{
+		count_directory_r(i);
+		dir.current += i.current;
+	}
+}
