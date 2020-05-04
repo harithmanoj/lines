@@ -33,6 +33,24 @@
 #include <vector>
 #include <algorithm>
 
+#ifdef _DEBUG
+
+#define LINES_DEBUG
+
+#endif
+
+#ifdef LINES_DEBUG
+
+#define REPLACE(x)			x
+
+#else
+
+#define REPLACE(x)
+
+#endif
+
+#define LOG(x)				REPLACE(std::cout << __LINE__ << " " << __func__ << x << "\n")
+
 namespace fs = std::filesystem;
 
 // so as not to pollute the global space
