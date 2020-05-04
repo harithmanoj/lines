@@ -73,7 +73,7 @@ namespace lines
 	// get file structure of element, if directory gets subdirectory if recursive is true
 	// if file directory::files and directory::dirs is empty
 	// if no recursive directory::dirs is empty
-	directory getFileStructure(path element, bool recursive, std::vector<std::string> extensions);
+	directory get_file_structure(path element, bool recursive, std::vector<std::string> extensions);
 
 	bool check_string(const std::string& in, LineCount& info, bool prev_state);
 
@@ -82,6 +82,12 @@ namespace lines
 
 	void count_directory_r(directory& dir);
 
+	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
+	{
+		auto dir = get_file_structure(argument, isRecursive, extensions);
+		count_directory_r(dir);
+		return dir;
+	}
 
 
 	// Find line count of specified file

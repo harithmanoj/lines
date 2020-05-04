@@ -23,7 +23,7 @@
 
 #include "lines.h"
 
-lines::directory lines::getFileStructure(path element, bool recursive, std::vector<std::string> extensions)
+lines::directory lines::get_file_structure(path element, bool recursive, std::vector<std::string> extensions)
 {
 	directory ret{ {element,0,0},{},{} };
 	if (fs::is_regular_file(element))
@@ -36,7 +36,7 @@ lines::directory lines::getFileStructure(path element, bool recursive, std::vect
 
 			if (recursive)
 				if (fs::is_directory(element_path))
-					ret.dirs.push_back(getFileStructure(element_path, true, extensions));
+					ret.dirs.push_back(get_file_structure(element_path, true, extensions));
 			//if recursive add to directory::dirs
 			if (fs::is_regular_file(element_path)) // if file add to directory::files
 			{
