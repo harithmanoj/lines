@@ -52,6 +52,14 @@ namespace lines
 		unsigned long long stripped = 0;
 	};
 
+
+	struct directory
+	{
+		LineCount current;
+		std::vector<LineCount> files;
+		std::vector<directory> dirs;
+	};
+
 	// Find line count of specified file
 	unsigned long find_length(path file)
 	{
