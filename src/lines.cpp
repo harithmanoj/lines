@@ -142,3 +142,28 @@ void lines::count_directory_r(directory& dir)
 		dir.current += i.current;
 	}
 }
+
+
+void lines::write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0)
+{
+	std::string intendation(depth, '\t');
+
+	out << intendation << file.component.filename().string() << "\n";
+	out << intendation << "Total lines : " << file.total << "\n";
+	out << intendation << "Code lines : " << file.stripped << "\n";
+}
+
+void lines::write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0)
+{
+	std::string intendation(depth, '\t');
+
+	out << intendation << dir.current.component.stem().string() << "\n";
+	out << intendation << "Total lines : " << dir.current.total << "\n";
+	out << intendation << "Code lines : " << dir.current.stripped << "\n";
+
+	for (auto& i : dir.files)
+		write_to_stream(out, i, depth + 1);
+
+	for (auto& i : dir.dirs)
+		write_to_stream(out, i, depth + 1);
+}
