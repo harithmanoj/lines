@@ -49,7 +49,7 @@
 
 #endif
 
-#define LOG(x)				REPLACE(std::cout << __LINE__ << " " << __func__ << x << "\n")
+#define LOG(x)				REPLACE(((std::cout << __LINE__ << " " << __func__ << " " )<< x) << "\n")
 
 namespace fs = std::filesystem;
 
@@ -75,6 +75,7 @@ namespace lines
 		{
 			total += other.total;
 			stripped += other.stripped;
+			return *this;
 		}
 	};
 
