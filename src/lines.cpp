@@ -36,10 +36,11 @@ namespace lines
 			return ret; // only file
 		if (fs::is_directory(element)) // if directory
 		{
+			LOG("directory");
 			for (auto& el : fs::directory_iterator(element)) // iterate over elements
 			{
 				auto element_path = el.path();
-
+				LOG(element_path.string());
 				if (recursive)
 					if (fs::is_directory(element_path))
 						ret.dirs.push_back(get_file_structure(element_path, true, extensions));
@@ -122,7 +123,7 @@ namespace lines
 			throw std::invalid_argument("empty path");
 		if (!fs::is_directory(count.component))
 			throw std::invalid_argument("argument must be directory");
-
+		LOG(count.component.string());
 		std::ifstream file(count.component);
 
 		std::string input;
@@ -133,6 +134,7 @@ namespace lines
 			comment = check_string(input, count, comment);
 			std::getline(file, input);
 		}
+		LOG(count.total << " " << count.stripped);
 	}
 
 	// counts total lines in a directory recursively
@@ -140,12 +142,14 @@ namespace lines
 	{
 		for (auto& i : dir.files)
 		{
+			LOG(i.component.string());
 			count_file_lines(i);
 			dir.current += i;
 		}
 
 		for (auto& i : dir.dirs)
 		{
+			LOG(i.current.component.string());
 			count_directory_r(i);
 			dir.current += i.current;
 		}
