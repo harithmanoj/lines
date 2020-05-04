@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	LOG("after no file error");
+
 	//display only
 	bool local = false;
 	int argexp = 2;
@@ -60,6 +62,14 @@ int main(int argc, char* argv[])
 	//path of target
 	lines::path dir = argv[argc - 1];
 
+	if (!fs::exists(dir))
+	{
+		std::cout << dir << " is niether a directory or a file\n";
+		return 0;
+	}
+
+	LOG(dir.string() << "  dir");
+
 	//has extension constraints
 	std::vector<std::string> ex;
 
@@ -76,10 +86,13 @@ int main(int argc, char* argv[])
 	{
 		for (int i = argexp; i < argc - 1; ++i)
 			ex.push_back(argv[i]);
+		LOG("registered extensions");
 	}
+	
 
 	// populated directory structure
 	auto ret = lines::count_all(dir, rec, ex);
+	LOG("count complete");
 
 	if (!local)
 	{
