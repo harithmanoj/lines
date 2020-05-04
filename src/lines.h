@@ -30,6 +30,8 @@
 #include <filesystem>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 // so as not to pollute the global space
 namespace lines
@@ -52,13 +54,48 @@ namespace lines
 		unsigned long long stripped = 0;
 	};
 
-
+	//encapsulates directory information including sub-directories
 	struct directory
 	{
-		LineCount current;
-		std::vector<LineCount> files;
-		std::vector<directory> dirs;
+		LineCount current; // line count info
+		std::vector<LineCount> files; // files
+		std::vector<directory> dirs; // sub-directories
 	};
+
+	// get file structure of element, if directory gets subdirectory if recursive is true
+	// if file directory::files and directory::dirs is empty
+	// if no recursive directory::dirs is empty
+	directory getFileStructure(path element, bool recursive, std::vector<std::string> extensions)
+	{
+		directory ret{ {element,0,0},{},{} };
+		if (fs::is_regular_file(element))
+			return ret; // only file
+		if (fs::is_directory(element)) // if directory
+		{
+			for (auto& el : fs::directory_iterator(element)) // iterate over elements
+			{
+				auto element_path = el.path(); 
+				
+				if (recursive)
+					if (fs::is_directory(element_path))
+						ret.dirs.push_back(getFileStructure(element_path, true, extensions)); 
+														//if recursive add to directory::dirs
+				if (fs::is_regular_file(element_path)) // if file add to directory::files
+				{
+					bool reg = extensions.size() == 0;
+					reg = reg ||
+						(std::find(extensions.begin(), extensions.end(),
+							element_path.extension()) != extensions.end());
+					if (reg) // only add if extensions is empty or file extension is present in extensions vector
+					{
+						ret.files.push_back({ element_path,0,0 });
+					}
+				}
+				
+			}
+		}
+		return ret;
+	}
 
 	bool check_string(std::string in, LineCount& info, bool prev_state)
 	{
