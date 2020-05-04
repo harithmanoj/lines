@@ -52,7 +52,15 @@ namespace lines
 
 		//comment and whitespace stripped count
 		unsigned long long stripped = 0;
+
+		LineCount& operator += (LineCount other)
+		{
+			total += other.total;
+			stripped += other.stripped;
+		}
 	};
+
+
 
 	//encapsulates directory information including sub-directories
 	struct directory
@@ -97,7 +105,7 @@ namespace lines
 		return ret;
 	}
 
-	bool check_string(std::string in, LineCount& info, bool prev_state)
+	bool check_string(const std::string& in, LineCount& info, bool prev_state)
 	{
 		auto beg = in.find_first_not_of(" \t\n\v\f\r"); //begining discarding whitespace
 		auto end = in.find_last_not_of(" \t\n\v\f\r"); //ending discarding whitespace
@@ -149,6 +157,8 @@ namespace lines
 		++info.stripped; // else actual code exists
 		return false;
 	}
+
+	
 
 	// Find line count of specified file
 	unsigned long find_length(path file)
