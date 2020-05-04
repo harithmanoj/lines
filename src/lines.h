@@ -83,6 +83,7 @@ namespace lines
 	void count_directory_r(directory& dir);
 
 
+
 	// Find line count of specified file
 	unsigned long find_length(path file)
 	{
@@ -167,13 +168,22 @@ namespace lines
 		return ret;
 	}
 
-	void banner()
+	inline void banner()
 	{
 		std::cout << "\n-----------------------------------------------------------------------------\n";
 		std::cout << "\n\nProgram to count lines\n\n";
 		std::cout << " \t\t Open source project hosted at github\n\n";
 		std::cout << " \t\t\tVersion " << version_lines << "\n";
 		std::cout << "\n-----------------------------------------------------------------------------\n";
+	}
+
+	inline void help()
+	{
+		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
+			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
+			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
+			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
+			<< " switches can be mixed in the order : -l, -r, -e\n\n";
 	}
 
 }

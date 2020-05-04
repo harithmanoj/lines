@@ -41,13 +41,7 @@ int main(int argc, char* argv[])
 	int argexp = 2;
 
 	if (std::string(argv[argexp - 1]) == "?")
-	{
-		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
-			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
-			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
-			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
-			<< " switches can be mixed in the order : -l, -r, -e\n\n";
-	}
+		lines::help();
 
 	if (std::string(argv[argexp - 1]) == "-l")
 	{
