@@ -152,7 +152,9 @@ namespace lines
 	}
 
 
-	void lines::write_to_stream(std::ostream& out, const LineCount& file, unsigned depth)
+	// Write filename, lines counted etc for the given file 
+	//(depth means depth in the filesystem from passed path)
+	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0)
 	{
 		std::string intendation(depth, '\t');
 
@@ -161,7 +163,9 @@ namespace lines
 		out << intendation << "Code lines : " << file.stripped << "\n";
 	}
 
-	void lines::write_to_stream(std::ostream& out, const directory& dir, unsigned depth)
+	// Write directory name, lines counted etc for the given file and all elements
+	//(depth means depth in the filesystem from passed path)
+	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0)
 	{
 		std::string intendation(depth, '\t');
 
@@ -181,5 +185,13 @@ namespace lines
 		auto dir = get_file_structure(argument, isRecursive, extensions);
 		count_directory_r(dir);
 		return dir;
+	}
+
+	void lines::write(std::ostream& out, const directory& dir)
+	{
+		if (dir.dirs.size() == 0 && dir.files.size() == 0)
+			write_to_stream(out, dir.current);
+		else
+			write_to_stream(out, dir);
 	}
 }

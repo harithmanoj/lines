@@ -74,23 +74,9 @@ namespace lines
 
 	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions);
 
-	// Write filename, lines counted etc for the given file 
-	//(depth means depth in the filesystem from passed path)
-	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0);
-
-	// Write directory name, lines counted etc for the given file and all elements
-	//(depth means depth in the filesystem from passed path)
-	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0);
-
-
 	// Write to file generalized function
-	void write(std::ostream& out, const directory& dir)
-	{
-		if (dir.dirs.size() == 0 && dir.files.size() == 0)
-			write_to_stream(out, dir.current);
-		else
-			write_to_stream(out, dir);
-	}
+	void write(std::ostream& out, const directory& dir);
+
 	/*
 	// Find line count of specified file
 	unsigned long find_length(path file)
