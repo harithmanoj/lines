@@ -84,11 +84,11 @@ int main(int argc, char* argv[])
 	if (!local)
 	{
 		auto p = dir;
-		if (lines::fs::is_directory(dir))
-			p /= "line_total.lin";
-		else
-			p = p.parent_path();
-		std::ofstream out(dir / "line_total.lin");
+		if (fs::is_directory(dir))
+			p /= p.stem().string() + ".lin";
+		else if (fs::is_regular_file(dir))
+			p.replace_extension(".lin");
+		std::ofstream out(p);
 
 		lines::write(out, ret);
 	}

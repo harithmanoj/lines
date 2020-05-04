@@ -33,13 +33,13 @@
 #include <vector>
 #include <algorithm>
 
+namespace fs = std::filesystem;
+
 // so as not to pollute the global space
 namespace lines
 {
 
 	const constexpr char* version_lines = "v1.0.1";
-
-	namespace fs = std::filesystem;
 	using fs::path;
 
 	//struct for pairing line count with comments and without comments
