@@ -158,7 +158,25 @@ namespace lines
 		return false;
 	}
 
-	
+	void count_file_lines(LineCount& count)
+	{
+		if (count.component.empty())
+			throw std::invalid_argument("empty path");
+		if (!fs::is_directory(count.component))
+			throw std::invalid_argument("argument must be directory");
+
+		std::ifstream file(count.component);
+
+		std::string input;
+		bool comment = false;
+		std::getline(file, input);
+		while (!file.eof())
+		{
+			comment = check_string(input, count, comment);
+			std::getline(file, input);
+		}
+	}
+
 
 	// Find line count of specified file
 	unsigned long find_length(path file)
