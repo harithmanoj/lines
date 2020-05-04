@@ -89,6 +89,17 @@ namespace lines
 		return dir;
 	}
 
+	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0);
+
+	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0);
+
+	void write(std::ostream& out, const directory& dir)
+	{
+		if (dir.dirs.size() == 0 && dir.files.size() == 0)
+			write_to_stream(out, dir.current);
+		else
+			write_to_stream(out, dir);
+	}
 
 	// Find line count of specified file
 	unsigned long find_length(path file)
