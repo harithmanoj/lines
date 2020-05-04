@@ -37,6 +37,8 @@ int main(int argc, char* argv[])
 		std::cout << " no file ?\n";
 		return 0;
 	}
+
+	//display only
 	bool local = false;
 	int argexp = 2;
 
@@ -55,10 +57,13 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	//path of target
 	lines::path dir = argv[argc - 1];
 
+	//has extension constraints
 	std::vector<std::string> ex;
 
+	//is recursive
 	bool rec = false;
 
 	if (std::string(argv[argexp - 1]) == "-r")
@@ -73,7 +78,8 @@ int main(int argc, char* argv[])
 			ex.push_back(argv[i]);
 	}
 
-	auto ret = lines::all_files(dir, ex, rec);
+	// populated directory structure
+	auto ret = lines::count_all(dir, rec, ex);
 
 	if (!local)
 	{
@@ -84,8 +90,10 @@ int main(int argc, char* argv[])
 			p = p.parent_path();
 		std::ofstream out(dir / "line_total.lin");
 
-		out << "total lines in directory : " << ret << "\n";
+		lines::write(out, ret);
 	}
-	std::cout << dir << " has total lines " << ret << "\n";
+	
+	lines::write(std::cout, ret);
+
 	return 0;
 }
