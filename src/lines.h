@@ -178,6 +178,22 @@ namespace lines
 	}
 
 
+	void count_directory_r(directory& dir)
+	{
+		for (auto& i : dir.files)
+		{
+			count_file_lines(i);
+			dir.current += i;
+		}
+
+		for (auto& i : dir.dirs)
+		{
+			count_directory_r(i);
+			dir.current += i.current;
+		}
+	}
+
+
 	// Find line count of specified file
 	unsigned long find_length(path file)
 	{
