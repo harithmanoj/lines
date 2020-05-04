@@ -75,11 +75,6 @@ namespace lines
 	// if no recursive directory::dirs is empty
 	directory get_file_structure(path element, bool recursive, std::vector<std::string> extensions);
 
-	bool check_string(const std::string& in, LineCount& info, bool prev_state);
-
-	void count_file_lines(LineCount& count);
-
-
 	void count_directory_r(directory& dir);
 
 	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
@@ -89,10 +84,16 @@ namespace lines
 		return dir;
 	}
 
+	// Write filename, lines counted etc for the given file 
+	//(depth means depth in the filesystem from passed path)
 	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0);
 
+	// Write directory name, lines counted etc for the given file and all elements
+	//(depth means depth in the filesystem from passed path)
 	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0);
 
+
+	// Write to file generalized function
 	void write(std::ostream& out, const directory& dir)
 	{
 		if (dir.dirs.size() == 0 && dir.files.size() == 0)
