@@ -40,6 +40,17 @@ namespace lines
 	namespace fs = std::filesystem;
 	using fs::path;
 
+	//struct for pairing line count with comments and without comments
+	struct LineCount
+	{
+		path component;
+
+		// total line count
+		unsigned long long total = 0;
+
+		//comment and whitespace stripped count
+		unsigned long long stripped = 0;
+	};
 
 	// Find line count of specified file
 	unsigned long find_length(path file)
