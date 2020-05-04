@@ -25,8 +25,12 @@
 
 namespace lines
 {
-	lines::directory lines::get_file_structure(path element, bool recursive, std::vector<std::string> extensions)
+	// get file structure of element, if directory gets subdirectory if recursive is true
+	// if file directory::files and directory::dirs is empty
+	// if no recursive directory::dirs is empty
+	lines::directory get_file_structure(path element, bool recursive, std::vector<std::string> extensions)
 	{
+		//directory to return
 		directory ret{ {element,0,0},{},{} };
 		if (fs::is_regular_file(element))
 			return ret; // only file
@@ -57,7 +61,8 @@ namespace lines
 		return ret;
 	}
 
-	bool lines::check_string(const std::string& in, LineCount& info, bool prev_state)
+	//checks if string can be added to stripped count, checks if comment starts or stops there
+	bool check_string(const std::string& in, LineCount& info, bool prev_state)
 	{
 		auto beg = in.find_first_not_of(" \t\n\v\f\r"); //begining discarding whitespace
 		auto end = in.find_last_not_of(" \t\n\v\f\r"); //ending discarding whitespace
@@ -110,7 +115,8 @@ namespace lines
 		return false;
 	}
 
-	void lines::count_file_lines(LineCount& count)
+	//counts total lines in a file
+	void count_file_lines(LineCount& count)
 	{
 		if (count.component.empty())
 			throw std::invalid_argument("empty path");
@@ -129,8 +135,8 @@ namespace lines
 		}
 	}
 
-
-	void lines::count_directory_r(directory& dir)
+	// counts total lines in a directory recursively
+	void count_directory_r(directory& dir)
 	{
 		for (auto& i : dir.files)
 		{
@@ -146,7 +152,7 @@ namespace lines
 	}
 
 
-	void lines::write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0)
+	void lines::write_to_stream(std::ostream& out, const LineCount& file, unsigned depth)
 	{
 		std::string intendation(depth, '\t');
 
@@ -155,7 +161,7 @@ namespace lines
 		out << intendation << "Code lines : " << file.stripped << "\n";
 	}
 
-	void lines::write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0)
+	void lines::write_to_stream(std::ostream& out, const directory& dir, unsigned depth)
 	{
 		std::string intendation(depth, '\t');
 
@@ -168,5 +174,12 @@ namespace lines
 
 		for (auto& i : dir.dirs)
 			write_to_stream(out, i, depth + 1);
+	}
+
+	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
+	{
+		auto dir = get_file_structure(argument, isRecursive, extensions);
+		count_directory_r(dir);
+		return dir;
 	}
 }

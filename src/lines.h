@@ -70,19 +70,9 @@ namespace lines
 		std::vector<directory> dirs; // sub-directories
 	};
 
-	// get file structure of element, if directory gets subdirectory if recursive is true
-	// if file directory::files and directory::dirs is empty
-	// if no recursive directory::dirs is empty
-	directory get_file_structure(path element, bool recursive, std::vector<std::string> extensions);
+	
 
-	void count_directory_r(directory& dir);
-
-	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
-	{
-		auto dir = get_file_structure(argument, isRecursive, extensions);
-		count_directory_r(dir);
-		return dir;
-	}
+	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions);
 
 	// Write filename, lines counted etc for the given file 
 	//(depth means depth in the filesystem from passed path)
@@ -101,7 +91,7 @@ namespace lines
 		else
 			write_to_stream(out, dir);
 	}
-
+	/*
 	// Find line count of specified file
 	unsigned long find_length(path file)
 	{
@@ -185,7 +175,7 @@ namespace lines
 		}
 		return ret;
 	}
-
+	*/
 	inline void banner()
 	{
 		std::cout << "\n-----------------------------------------------------------------------------\n";
