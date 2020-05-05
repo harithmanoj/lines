@@ -57,7 +57,7 @@ namespace fs = std::filesystem;
 namespace lines
 {
 
-	const constexpr char* version_lines = "v1.0.1";
+	const constexpr char* version_lines = "v1.1.2";
 	using fs::path;
 
 	//struct for pairing line count with comments and without comments
