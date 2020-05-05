@@ -79,20 +79,35 @@ int main(int argc, char* argv[])
 	//is recursive
 	bool rec = false;
 
+	std::cout << "Executing ";
+	
+	if (local)
+		std::cout << "localy ";
+
+	std::cout << "with";
+
 	if (std::string(argv[argexp - 1]) == "-r")
 	{
 		rec = true;
 		++argexp;
 	}
+	else
+		std::cout << "out";
+	std::cout << " recursion and ";
+
 
 	if (std::string(argv[argexp - 1]) == "-e")
 	{
 		for (int i = argexp; i < argc - 1; ++i)
+		{
 			ex.push_back(argv[i]);
-		LOG("registered extensions");
+			std::cout << argv[i] << " ";
+		}
 	}
+	else
+		std::cout << "all ";
+	std::cout << "extensions\n";
 	
-
 	// populated directory structure
 	auto ret = lines::count_lines(dir, rec, ex);
 	LOG("count complete");
