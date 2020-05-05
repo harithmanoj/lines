@@ -34,97 +34,21 @@ int main(int argc, char* argv[])
 	lines::banner();
 	if (argc == 1)
 	{
-		std::cout << " no file ?\n";
 		return 0;
 	}
+
+	lines::mode working;
+	std::vector<std::string> extensions;
+	lines::path file;
+	try {
+		file = lines::parse(argc, argv, working, extensions);
+	}
+	catch (std::invalid_argument ex)
+	{
+		std::cout << "Error : " << ex.what();
+	}
+	lines::execute(working, extensions, file);
 
 	LOG("after no file error");
-
-	//display only
-	bool local = false;
-	int argexp = 2;
-
-	if (std::string(argv[argexp - 1]) == "?")
-	{
-		lines::help();
-		return 0;
-	}
-
-	if (std::string(argv[argexp - 1]) == "-l")
-	{
-		local = true;
-		++argexp;
-	}
-
-	if (argc < argexp)
-	{
-		std::cout << "no file?";
-		return 0;
-	}
-
-	//path of target
-	lines::path dir = argv[argc - 1];
-
-	if (!fs::exists(dir))
-	{
-		std::cout << dir << " is niether a directory or a file\n";
-		return 0;
-	}
-
-	LOG(dir.string() << "  dir");
-
-	//has extension constraints
-	std::vector<std::string> ex;
-
-	//is recursive
-	bool rec = false;
-
-	std::cout << "Executing ";
-	
-	if (local)
-		std::cout << "localy ";
-
-	std::cout << "with";
-
-	if (std::string(argv[argexp - 1]) == "-r")
-	{
-		rec = true;
-		++argexp;
-	}
-	else
-		std::cout << "out";
-	std::cout << " recursion and ";
-
-
-	if (std::string(argv[argexp - 1]) == "-e")
-	{
-		for (int i = argexp; i < argc - 1; ++i)
-		{
-			ex.push_back(argv[i]);
-			std::cout << argv[i] << " ";
-		}
-	}
-	else
-		std::cout << "all ";
-	std::cout << "extensions\n";
-	
-	// populated directory structure
-	auto ret = lines::count_lines(dir, rec, ex);
-	LOG("count complete");
-
-	if (!local)
-	{
-		auto p = dir;
-		if (fs::is_directory(dir))
-			p /= p.stem().string() + ".lin";
-		else if (fs::is_regular_file(dir))
-			p.replace_extension(".lin");
-		std::ofstream out(p);
-
-		lines::write(out, ret);
-	}
-	
-	lines::write(std::cout, ret);
-
 	return 0;
 }
