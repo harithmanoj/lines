@@ -1,15 +1,16 @@
 lines
 ===================
 
-lines is free and open source program that counts all lines of files. 
-[GPL License](License.md).
+lines is free and open source program that counts all lines of files.
+
+It is release under [GPL License](License.md).
 
 Build lines
 ---------------
 
-To build lines from the source, simply compile main.cpp in your favourite compiler.
+To build lines from the source, simply compile main.cpp and lines.cpp in your favourite compiler.
 
-Ensure that lines.h is in the same directory as main.cpp, also minimum c++17 is required for building it correctly.
+Ensure that lines.h is in the same directory as main.cpp and lines.cpp, also minimum c++17 is required for building it correctly.
 
 Contribution
 ------------
