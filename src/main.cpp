@@ -45,7 +45,10 @@ int main(int argc, char* argv[])
 	int argexp = 2;
 
 	if (std::string(argv[argexp - 1]) == "?")
+	{
 		lines::help();
+		return 0;
+	}
 
 	if (std::string(argv[argexp - 1]) == "-l")
 	{
@@ -91,7 +94,7 @@ int main(int argc, char* argv[])
 	
 
 	// populated directory structure
-	auto ret = lines::count_all(dir, rec, ex);
+	auto ret = lines::count_lines(dir, rec, ex);
 	LOG("count complete");
 
 	if (!local)
