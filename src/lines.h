@@ -102,7 +102,7 @@ namespace lines
 				dirs.push_back(new directory(*i));
 		}
 
-		directory(directory&& in) : current(in.current), files(in.files)
+		directory(directory&& in) noexcept : current(in.current), files(in.files)
 		{
 			for (auto& i : in.dirs)
 			{
@@ -120,7 +120,7 @@ namespace lines
 			return *this;
 		}
 
-		directory& operator = (directory&& in)
+		directory& operator = (directory&& in) noexcept
 		{
 			current = in.current;
 			files = in.files;
