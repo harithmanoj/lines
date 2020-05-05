@@ -145,8 +145,8 @@ namespace lines
 		std::string intendation(depth, '\t');
 
 		out << intendation << file.component.filename().string() << "\n";
-		out << intendation << "Total lines : " << file.total << "\n";
-		out << intendation << "Code lines : " << file.stripped << "\n";
+		out << intendation << "\tTotal lines : " << file.total << "\n";
+		out << intendation << "\tCode lines : " << file.stripped << "\n";
 	}
 
 	// Write directory name, lines counted etc for the given file and all elements
@@ -155,9 +155,9 @@ namespace lines
 	{
 		std::string intendation(depth, '\t');
 
-		out << intendation << dir.current.component.stem().string() << "\n";
-		out << intendation << "Total lines : " << dir.current.total << "\n";
-		out << intendation << "Code lines : " << dir.current.stripped << "\n";
+		out << intendation << "directory : " << dir.current.component.stem().string() << "\n";
+		out << intendation << "\tTotal lines : " << dir.current.total << "\n";
+		out << intendation << "\tCode lines : " << dir.current.stripped << "\n\n";
 
 		for (auto& i : dir.files)
 			write_to_stream(out, i, depth + 1);

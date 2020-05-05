@@ -109,7 +109,7 @@ namespace lines
 	// if file directory::files and directory::dirs is empty
 	// if no recursive directory::dirs is empty
 	// also count lines in each file and add it to the structure
-	directory lines::count_lines(path element, bool recursive, std::vector<std::string> extensions);
+	directory count_lines(path element, bool recursive, std::vector<std::string> extensions);
 
 	// Write to file generalized function
 	void write(std::ostream& out, const directory& dir);
