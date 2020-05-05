@@ -149,7 +149,7 @@ namespace lines
 	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0)
 	{
 		std::string intendation(depth, '\t');
-
+		LOG(" writing " + file.component.filename().string());
 		out << intendation << file.component.filename().string() << "\n";
 		out << intendation << "\tTotal lines : " << file.total << "\n";
 		out << intendation << "\tCode lines : " << file.stripped << "\n";
@@ -160,7 +160,6 @@ namespace lines
 	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0, bool dir_only = false)
 	{
 		std::string intendation(depth, '\t');
-
 		out << intendation << "directory : " << dir.current.component.stem().string() << "\n";
 		out << intendation << "\tTotal lines : " << dir.current.total << "\n";
 		out << intendation << "\tCode lines : " << dir.current.stripped << "\n\n";
@@ -234,8 +233,10 @@ namespace lines
 		}
 		else
 			std::cout << "all files and directory totals\n";
-		directory ret = count_lines(element, recursive, extensions); //count lines from directory
 
+		LOG("start counting");
+		directory ret = count_lines(element, recursive, extensions); //count lines from directory
+		LOG("end counting");
 		write(std::cout, ret, master, dir); // write to display
 		if (!local) // if not local, write to file
 		{
