@@ -34,8 +34,12 @@ int main(int argc, char* argv[])
 	lines::banner();
 	if (argc == 1)
 	{
+		lines::help();
 		return 0;
 	}
+
+	REPLACE(for (int i = 0; i < argc; ++i))
+		LOG(argv[i] + std::string(" "));
 
 	lines::mode working;
 	std::vector<std::string> extensions;
@@ -46,6 +50,7 @@ int main(int argc, char* argv[])
 	catch (std::invalid_argument ex)
 	{
 		std::cout << "Error : " << ex.what();
+		return 0;
 	}
 	lines::execute(working, extensions, file);
 
