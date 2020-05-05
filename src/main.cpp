@@ -31,28 +31,29 @@
 
 int main(int argc, char* argv[])
 {
-	lines::banner();
+	lines::banner(); // banner
 	if (argc == 1)
 	{
-		lines::help();
+		lines::help(); //display help if no argument
 		return 0;
 	}
 
 	REPLACE(for (int i = 0; i < argc; ++i))
-		LOG(argv[i] + std::string(" "));
+		LOG(argv[i] + std::string(" ")); //log command line argument
 
 	lines::mode working;
 	std::vector<std::string> extensions;
 	lines::path file;
 	try {
-		file = lines::parse(argc, argv, working, extensions);
+		file = lines::parse(argc, argv, working, extensions); //parse command
 	}
 	catch (std::invalid_argument ex)
 	{
-		std::cout << "Error : " << ex.what();
+		std::cout << "Error : " << ex.what() << "\n\n"; // if invalid input display help
+		lines::help();
 		return 0;
 	}
-	lines::execute(working, extensions, file);
+	lines::execute(working, extensions, file); //execute using mode specified
 
 	LOG("after no file error");
 	return 0;
