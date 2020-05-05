@@ -25,43 +25,6 @@
 
 namespace lines
 {
-	// get file structure of element, if directory gets subdirectory if recursive is true
-	// if file directory::files and directory::dirs is empty
-	// if no recursive directory::dirs is empty
-	lines::directory get_file_structure(path element, bool recursive, std::vector<std::string> extensions)
-	{
-		//directory to return
-		directory ret{ {element,0,0},{},{} };
-		if (fs::is_regular_file(element))
-			return ret; // only file
-		if (fs::is_directory(element)) // if directory
-		{
-			LOG("directory");
-			for (auto& el : fs::directory_iterator(element)) // iterate over elements
-			{
-				auto element_path = el.path();
-				LOG(element_path.string());
-				if (recursive)
-					if (fs::is_directory(element_path))
-						ret.add_dirs(get_file_structure(element_path, true, extensions));
-				//if recursive add to directory::dirs
-				if (fs::is_regular_file(element_path)) // if file add to directory::files
-				{
-					bool reg = extensions.size() == 0;
-					reg = reg ||
-						(std::find(extensions.begin(), extensions.end(),
-							element_path.extension()) != extensions.end());
-					if (reg) // only add if extensions is empty or file extension is present in extensions vector
-					{
-						ret.files.push_back({ element_path,0,0 });
-					}
-				}
-
-			}
-		}
-		return std::move(ret);
-	}
-
 	//checks if string can be added to stripped count, checks if comment starts or stops there
 	bool check_string(const std::string& in, LineCount& info, bool prev_state)
 	{
@@ -137,24 +100,43 @@ namespace lines
 		LOG(count.total << " " << count.stripped);
 	}
 
-	// counts total lines in a directory recursively
-	void count_directory_r(directory& dir)
+	
+	lines::directory lines::count_lines(path element, bool recursive, std::vector<std::string> extensions)
 	{
-		for (auto& i : dir.files)
+		//directory to return
+		directory ret{ {element,0,0},{},{} };
+		if (fs::is_regular_file(element))
 		{
-			LOG(i.component.string());
-			count_file_lines(i);
-			dir.current += i;
+			count_file_lines(ret.current);
+			return ret; // only file
 		}
+		if (fs::is_directory(element)) // if directory
+		{
+			LOG("directory");
+			for (auto& el : fs::directory_iterator(element)) // iterate over elements
+			{
+				auto element_path = el.path();
+				LOG(element_path.string());
+				if (recursive)
+					if (fs::is_directory(element_path))
+						ret.add_dirs(count_lines(element_path, true, extensions));
+				//if recursive add to directory::dirs
+				if (fs::is_regular_file(element_path)) // if file add to directory::files
+				{
+					bool reg = extensions.size() == 0;
+					reg = reg ||
+						(std::find(extensions.begin(), extensions.end(),
+							element_path.extension()) != extensions.end());
+					if (reg) // only add if extensions is empty or file extension is present in extensions vector
+					{
+						ret.add_file(element_path);
+					}
+				}
 
-		for (auto& i : dir.dirs)
-		{
-			LOG(i->current.component.string());
-			count_directory_r(*i);
-			dir.current += i->current;
+			}
 		}
+		return std::move(ret);
 	}
-
 
 	// Write filename, lines counted etc for the given file 
 	//(depth means depth in the filesystem from passed path)
@@ -184,13 +166,6 @@ namespace lines
 			write_to_stream(out, *i, depth + 1);
 	}
 
-	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
-	{
-		auto dir = get_file_structure(argument, isRecursive, extensions);
-		count_directory_r(dir);
-		return dir;
-	}
-
 	void lines::write(std::ostream& out, const directory& dir)
 	{
 		if (dir.dirs.size() == 0 && dir.files.size() == 0)
@@ -198,4 +173,13 @@ namespace lines
 		else
 			write_to_stream(out, dir);
 	}
+
+	void directory::add_file(path file)
+	{
+		LineCount in{ file,0,0 };
+		count_file_lines(in);
+		current += in;
+		files.push_back(in);
+	}
+
 }

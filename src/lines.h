@@ -90,8 +90,11 @@ namespace lines
 
 		void add_dirs(directory&& in)
 		{
+			current += in.current;
 			dirs.push_back(new directory(in));
 		}
+
+		void add_file(path file);
 
 		~directory()
 		{
@@ -102,8 +105,11 @@ namespace lines
 	};
 
 	
-
-	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions);
+	// get file structure of element, if directory gets subdirectory if recursive is true
+	// if file directory::files and directory::dirs is empty
+	// if no recursive directory::dirs is empty
+	// also count lines in each file and add it to the structure
+	directory lines::count_lines(path element, bool recursive, std::vector<std::string> extensions);
 
 	// Write to file generalized function
 	void write(std::ostream& out, const directory& dir);
