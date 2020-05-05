@@ -94,7 +94,12 @@ namespace lines
 			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
 			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
 			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
-			<< " switches can be mixed in the order : -l, -r, -e\n\n";
+			<< " lines -m [dir / file] : counts according to if -r is set or not, but outputs the total only\n"
+			<< " lines -d [dir / file] : counts according to if -r is set or not, but outputs the"
+			<< " totals of each directory\n"
+			<< " lines ? : display this message\n"
+			<< " switches can be mixed in the order : -l, -r, -m, -d, -e\n"
+			<< " order : lines [-l] [-r] [-m] [-d] [-e] [ext] [file / directory]\n\n";
 	}
 
 	// To identify which all switches were passed
