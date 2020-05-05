@@ -112,6 +112,14 @@ namespace lines
 	{
 		lhs = static_cast<mode>(static_cast<unsigned char>(lhs)
 			| static_cast<unsigned char>(rhs));
+		return lhs;
+	}
+
+	inline mode& operator |= (mode& lhs, mode&& rhs) noexcept
+	{
+		lhs = static_cast<mode>(static_cast<unsigned char>(lhs)
+			| static_cast<unsigned char>(rhs));
+		return lhs;
 	}
 
 	//function to check if specific bitfields are high
