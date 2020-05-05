@@ -43,7 +43,7 @@ namespace lines
 				LOG(element_path.string());
 				if (recursive)
 					if (fs::is_directory(element_path))
-						ret.dirs.push_back(get_file_structure(element_path, true, extensions));
+						ret.add_dirs(get_file_structure(element_path, true, extensions));
 				//if recursive add to directory::dirs
 				if (fs::is_regular_file(element_path)) // if file add to directory::files
 				{
@@ -59,7 +59,7 @@ namespace lines
 
 			}
 		}
-		return ret;
+		return std::move(ret);
 	}
 
 	//checks if string can be added to stripped count, checks if comment starts or stops there
@@ -121,7 +121,7 @@ namespace lines
 	{
 		if (count.component.empty())
 			throw std::invalid_argument("empty path");
-		if (!fs::is_directory(count.component))
+		if (!fs::is_regular_file(count.component))
 			throw std::invalid_argument("argument must be directory");
 		LOG(count.component.string());
 		std::ifstream file(count.component);
@@ -149,9 +149,9 @@ namespace lines
 
 		for (auto& i : dir.dirs)
 		{
-			LOG(i.current.component.string());
-			count_directory_r(i);
-			dir.current += i.current;
+			LOG(i->current.component.string());
+			count_directory_r(*i);
+			dir.current += i->current;
 		}
 	}
 
@@ -181,7 +181,7 @@ namespace lines
 			write_to_stream(out, i, depth + 1);
 
 		for (auto& i : dir.dirs)
-			write_to_stream(out, i, depth + 1);
+			write_to_stream(out, *i, depth + 1);
 	}
 
 	directory count_all(path argument, bool isRecursive, std::vector<std::string> extensions)
