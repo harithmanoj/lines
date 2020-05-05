@@ -119,7 +119,12 @@ namespace lines
 				LOG(element_path.string());
 				if (recursive)
 					if (fs::is_directory(element_path))
-						ret.add_dirs(count_lines(element_path, true, extensions));
+					{
+						auto t = count_lines(element_path, true, extensions);
+						if (t.files.size() != 0 || t.dirs.size() != 0)
+							ret.add_dirs(std::move(t));
+					}
+
 				//if recursive add to directory::dirs
 				if (fs::is_regular_file(element_path)) // if file add to directory::files
 				{
@@ -132,7 +137,6 @@ namespace lines
 						ret.add_file(element_path);
 					}
 				}
-
 			}
 		}
 		return std::move(ret);
