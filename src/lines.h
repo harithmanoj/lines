@@ -79,6 +79,34 @@ namespace lines
 		}
 	};
 
+	inline void banner()
+	{
+		std::cout << "\n-----------------------------------------------------------------------------\n";
+		std::cout << "\n\nProgram to count lines\n\n";
+		std::cout << " \t\t Open source project hosted at github\n\n";
+		std::cout << " \t\t\tVersion " << version_lines << "\n";
+		std::cout << "\n-----------------------------------------------------------------------------\n";
+	}
+
+	inline void help()
+	{
+		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
+			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
+			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
+			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
+			<< " switches can be mixed in the order : -l, -r, -e\n\n";
+	}
+
+	// To identify which all switches were passed
+	enum mode : unsigned char
+	{
+		HELP = 0x00, //help
+		LOCAL = 0x01, //local
+		EXTENSIONS = 0x02, // extensions
+		RECURSIVE = 0x04, // recursive
+		DIR = 0x8, // directory only output
+		MASTER_DIR = DIR + 0x10 // master directory only output
+	};
 
 
 	//encapsulates directory information including sub-directories
@@ -158,108 +186,7 @@ namespace lines
 	// Write to file generalized function
 	void write(std::ostream& out, const directory& dir);
 
-	/*
-	// Find line count of specified file
-	unsigned long find_length(path file)
-	{
-		unsigned long ret = 0;
-
-		// if not file throw error
-		if (!fs::is_regular_file(file))
-			throw std::invalid_argument("not regular file");
-
-		std::ifstream in(file);
-
-		std::string st;
-		std::getline(in, st);
-		while (!in.eof()) //till end of file
-		{
-			if (st.find_first_not_of(" \t\n\v\f\r") != std::string::npos)
-				++ret; // if line is not only whitespace
-			std::getline(in, st);
-		}
-		return ret;
-	}
-
-	// get total lines for all files in the directory.
-	unsigned long long all_files(path directory, std::vector<std::string> permitted, bool rec = false)
-	{
-		unsigned long long ret = 0;
-
-		if (!fs::is_directory(directory))
-		{
-			if (!fs::is_regular_file(directory))
-				throw std::invalid_argument("not directory nor file");
-			else
-				return find_length(directory);
-		}
-
-		if (!rec)
-		{
-			if (permitted.size() == 0)
-				for (auto& p : fs::directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-						ret += find_length(file);
-				}
-			else
-				for (auto& p : fs::directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-					{
-						if ((std::find(permitted.begin(), permitted.end(), file.extension())
-							!= permitted.end()))
-						{
-							ret += find_length(file);
-						}
-					}
-				}
-		}
-		else
-		{
-			if (permitted.size() == 0)
-				for (auto& p : fs::recursive_directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-						ret += find_length(file);
-				}
-			else
-				for (auto& p : fs::recursive_directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-					{
-						if ((std::find(permitted.begin(), permitted.end(), file.extension())
-							!= permitted.end()))
-						{
-							ret += find_length(file);
-						}
-					}
-				}
-		}
-		return ret;
-	}
-	*/
-	inline void banner()
-	{
-		std::cout << "\n-----------------------------------------------------------------------------\n";
-		std::cout << "\n\nProgram to count lines\n\n";
-		std::cout << " \t\t Open source project hosted at github\n\n";
-		std::cout << " \t\t\tVersion " << version_lines << "\n";
-		std::cout << "\n-----------------------------------------------------------------------------\n";
-	}
-
-	inline void help()
-	{
-		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
-			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
-			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
-			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
-			<< " switches can be mixed in the order : -l, -r, -e\n\n";
-	}
+	
 
 }
 
