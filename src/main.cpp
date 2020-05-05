@@ -37,16 +37,17 @@ int main(int argc, char* argv[])
 		std::cout << " no file ?\n";
 		return 0;
 	}
+
+	LOG("after no file error");
+
+	//display only
 	bool local = false;
 	int argexp = 2;
 
 	if (std::string(argv[argexp - 1]) == "?")
 	{
-		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
-			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
-			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
-			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
-			<< " switches can be mixed in the order : -l, -r, -e\n\n";
+		lines::help();
+		return 0;
 	}
 
 	if (std::string(argv[argexp - 1]) == "-l")
@@ -61,10 +62,21 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	//path of target
 	lines::path dir = argv[argc - 1];
 
+	if (!fs::exists(dir))
+	{
+		std::cout << dir << " is niether a directory or a file\n";
+		return 0;
+	}
+
+	LOG(dir.string() << "  dir");
+
+	//has extension constraints
 	std::vector<std::string> ex;
 
+	//is recursive
 	bool rec = false;
 
 	if (std::string(argv[argexp - 1]) == "-r")
@@ -77,21 +89,27 @@ int main(int argc, char* argv[])
 	{
 		for (int i = argexp; i < argc - 1; ++i)
 			ex.push_back(argv[i]);
+		LOG("registered extensions");
 	}
+	
 
-	auto ret = lines::all_files(dir, ex, rec);
+	// populated directory structure
+	auto ret = lines::count_lines(dir, rec, ex);
+	LOG("count complete");
 
 	if (!local)
 	{
 		auto p = dir;
-		if (lines::fs::is_directory(dir))
-			p /= "line_total.lin";
-		else
-			p = p.parent_path();
-		std::ofstream out(dir / "line_total.lin");
+		if (fs::is_directory(dir))
+			p /= p.stem().string() + ".lin";
+		else if (fs::is_regular_file(dir))
+			p.replace_extension(".lin");
+		std::ofstream out(p);
 
-		out << "total lines in directory : " << ret << "\n";
+		lines::write(out, ret);
 	}
-	std::cout << dir << " has total lines " << ret << "\n";
+	
+	lines::write(std::cout, ret);
+
 	return 0;
 }
