@@ -86,7 +86,19 @@ namespace lines
 	{
 		LineCount current; // line count info
 		std::vector<LineCount> files; // files
-		std::vector<directory> dirs; // sub-directories
+		std::vector<directory*> dirs; // sub-directories
+
+		void add_dirs(directory&& in)
+		{
+			dirs.push_back(new directory(in));
+		}
+
+		~directory()
+		{
+			for (auto& i : dirs)
+				if (i != nullptr)
+					delete i;
+		}
 	};
 
 	
