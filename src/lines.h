@@ -117,6 +117,22 @@ namespace lines
 	}
 
 
+	path parse(std::string cmd, mode& out, std::vector<std::string>& extensions);
+
+	void execute(mode type, std::vector<std::string>& extensions, path element)
+	{
+		if (checkField(type, HELP))
+			return help();
+		bool local = false;
+		bool recursive = false;
+		bool dir = false;
+		bool master = false;
+
+		if (checkField(type, LOCAL))
+			local = true;
+
+	}
+
 	//encapsulates directory information including sub-directories
 	struct directory
 	{
