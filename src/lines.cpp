@@ -87,15 +87,16 @@ namespace lines
 		if (!fs::is_regular_file(count.component))
 			throw std::invalid_argument("argument must be directory");
 		LOG(count.component.string());
-		std::ifstream file(count.component);
+
+		std::ifstream file(count.component); // open file
 
 		std::string input;
 		bool comment = false;
 		std::getline(file, input);
-		while (!file.eof())
+		while (!file.eof()) // till end of file
 		{
-			comment = check_string(input, count, comment);
-			std::getline(file, input);
+			comment = check_string(input, count, comment); //check if comment has been opened / closed, update counts
+			std::getline(file, input); // get next line
 		}
 		LOG(count.total << " " << count.stripped);
 	}
@@ -117,12 +118,13 @@ namespace lines
 			{
 				auto element_path = el.path();
 				LOG(element_path.string());
-				if (recursive)
+				if (recursive) //add directory only if recursive
 					if (fs::is_directory(element_path))
 					{
 						auto t = count_lines(element_path, true, extensions);
-						if (t.files.size() != 0 || t.dirs.size() != 0)
-							ret.add_dirs(std::move(t));
+						if (t.files.size() != 0 || t.dirs.size() != 0) // add directory only if 
+							ret.add_dirs(std::move(t)); //it has sub directories or files 
+															//that satisfy conditions
 					}
 
 				//if recursive add to directory::dirs
@@ -132,8 +134,8 @@ namespace lines
 					reg = reg ||
 						(std::find(extensions.begin(), extensions.end(),
 							element_path.extension()) != extensions.end());
-					if (reg) // only add if extensions is empty or file extension is present in extensions vector
-					{
+					if (reg) // only add if extensions is empty or file extension
+					{			// is present in extensions vector
 						ret.add_file(element_path);
 					}
 				}
@@ -163,7 +165,7 @@ namespace lines
 		out << intendation << "\tTotal lines : " << dir.current.total << "\n";
 		out << intendation << "\tCode lines : " << dir.current.stripped << "\n\n";
 
-		if (!dir_only)
+		if (!dir_only) // write files only if dir_only is not set
 			for (auto& i : dir.files)
 				write_to_stream(out, i, depth + 1);
 
@@ -175,7 +177,7 @@ namespace lines
 	{
 		if (dir.dirs.size() == 0 && dir.files.size() == 0)
 			write_to_stream(out, dir.current);
-		else if (master)
+		else if (master) // if master is set write only root totals
 		{
 			directory ps{ dir.current,{},{} };
 			write_to_stream(out, ps, 0, true);
@@ -187,19 +189,19 @@ namespace lines
 	void directory::add_file(path file)
 	{
 		LineCount in{ file,0,0 };
-		count_file_lines(in);
-		current += in;
+		count_file_lines(in); //count lines in file
+		current += in; // add it to directory totals
 		files.push_back(in);
 	}
 
 	void lines::execute(mode type, std::vector<std::string>& extensions, path element)
 	{
-		if (checkField(type, HELP))
+		if (checkField(type, HELP))		// if help, display and exit
 			return help();
-		bool local = false;
-		bool recursive = false;
-		bool dir = false;
-		bool master = false;
+		bool local = false;   // display only
+		bool recursive = false; // recursive counting
+		bool dir = false; // directory only output
+		bool master = false; // master directory only output
 
 		if (checkField(type, LOCAL))
 			local = true;
@@ -209,6 +211,7 @@ namespace lines
 			master = dir = true;
 		else if (checkField(type, DIR))
 			dir = true;
+
 		std::cout << "Counting lines of ";
 		if (extensions.size() != 0)
 		{
@@ -231,10 +234,10 @@ namespace lines
 		}
 		else
 			std::cout << "all files and directory totals\n";
-		directory ret = count_lines(element, recursive, extensions);
+		directory ret = count_lines(element, recursive, extensions); //count lines from directory
 
-		write(std::cout, ret, master, dir);
-		if (!local)
+		write(std::cout, ret, master, dir); // write to display
+		if (!local) // if not local, write to file
 		{
 			auto p = element;
 			if (fs::is_directory(element))
@@ -245,6 +248,73 @@ namespace lines
 
 			lines::write(out, ret, master, dir);
 		}
+	}
+
+	path parse(int argc, char* argv[], mode& out, std::vector<std::string>& extensions)
+	{
+		int argexp = 1;  
+
+		if(argc > argexp) // help command
+			if (argv[argexp] == std::string("?"))
+			{
+				out = HELP;
+				return path("");
+			}
+
+		if(argc > argexp) // has local switch been turned on
+			if (argv[argexp] == std::string("-l"))
+			{
+				out = LOCAL;
+				++argexp;
+			}
+
+		if (argc > argexp) // has recursive switch been set
+			if (argv[argexp] == std::string("-r"))
+			{
+				out |= RECURSIVE;
+				++argexp;
+			}
+
+		if (argc > argexp) // has master directory only switch been set
+			if (argv[argexp] == std::string("-m"))
+			{
+				out |= MASTER_DIR;
+				++argexp;
+			}
+
+		if (argc > argexp) // has directory only switch been set
+			if (argv[argexp] == std::string("-d"))
+			{
+				out |= DIR;
+				++argexp;
+			}
+
+		if (argc > argexp) // hase extensions constraints been set
+			if (argv[argexp] == std::string("-e"))
+			{
+				out |= EXTENSIONS;
+				++argexp;
+				for (argexp; argexp < argc; ++argexp)
+				{
+					if (argv[argexp][0] == '.')
+						extensions.push_back(argv[argexp]);
+					else
+						break; //read till the argument is not an extension 
+								//(does not start with '.')
+				}
+			}
+
+		std::string file = "";
+
+		for (argexp; argexp < argc; ++argexp)
+			file += std::string(" ") + argv[argexp]; // concatanate arguments after last switch
+
+		auto filep(path(std::move(file)));
+
+		if (!fs::exists(filep)) // if filesystem element does not exist throw exception
+			throw std::invalid_argument("file or folder does not exist");
+
+		return std::move(filep);
 	}
 
 }
