@@ -88,10 +88,54 @@ namespace lines
 		std::vector<LineCount> files; // files
 		std::vector<directory*> dirs; // sub-directories
 
+		inline directory() : current{ path(),0,0 } { ; }
+
+		directory(LineCount c, std::vector<LineCount> fl, std::vector<directory*>&& dr) : current(c), files(fl), dirs(dr)
+		{
+			for (auto& i : dr)
+				i = nullptr;
+		}
+
+		directory(const directory& in) : current(in.current), files(in.files)
+		{
+			for (auto& i : in.dirs)
+				dirs.push_back(new directory(*i));
+		}
+
+		directory(directory&& in) : current(in.current), files(in.files)
+		{
+			for (auto& i : in.dirs)
+			{
+				dirs.push_back(i);
+				i = nullptr;
+			}
+		}
+
+		directory& operator = (const directory& in) 
+		{
+			current = in.current;
+			files = in.files;
+			for (auto& i : in.dirs)
+				dirs.push_back(new directory(*i));
+			return *this;
+		}
+
+		directory& operator = (directory&& in)
+		{
+			current = in.current;
+			files = in.files;
+			for (auto& i : in.dirs)
+			{
+				dirs.push_back(i);
+				i = nullptr;
+			}
+			return *this;
+		}
+
 		void add_dirs(directory&& in)
 		{
 			current += in.current;
-			dirs.push_back(new directory(in));
+			dirs.push_back(new directory(std::move(in)));
 		}
 
 		void add_file(path file);
