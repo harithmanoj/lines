@@ -116,23 +116,6 @@ namespace lines
 		return ((in | field) == in);
 	}
 
-
-	path parse(std::string cmd, mode& out, std::vector<std::string>& extensions);
-
-	void execute(mode type, std::vector<std::string>& extensions, path element)
-	{
-		if (checkField(type, HELP))
-			return help();
-		bool local = false;
-		bool recursive = false;
-		bool dir = false;
-		bool master = false;
-
-		if (checkField(type, LOCAL))
-			local = true;
-
-	}
-
 	//encapsulates directory information including sub-directories
 	struct directory
 	{
@@ -163,7 +146,7 @@ namespace lines
 			}
 		}
 
-		directory& operator = (const directory& in) 
+		directory& operator = (const directory& in)
 		{
 			current = in.current;
 			files = in.files;
@@ -200,7 +183,8 @@ namespace lines
 		}
 	};
 
-	
+
+
 	// get file structure of element, if directory gets subdirectory if recursive is true
 	// if file directory::files and directory::dirs is empty
 	// if no recursive directory::dirs is empty
@@ -208,8 +192,15 @@ namespace lines
 	directory count_lines(path element, bool recursive, std::vector<std::string> extensions);
 
 	// Write to file generalized function
-	void write(std::ostream& out, const directory& dir);
+	void write(std::ostream& out, const directory& dir, bool master = false, bool dir_only = false);
 
+
+
+	path parse(std::string cmd, mode& out, std::vector<std::string>& extensions);
+
+
+	//executes according to mode indicatd by type
+	void execute(mode type, std::vector<std::string>& extensions, path element);	
 	
 
 }
