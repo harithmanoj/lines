@@ -192,4 +192,59 @@ namespace lines
 		files.push_back(in);
 	}
 
+	void lines::execute(mode type, std::vector<std::string>& extensions, path element)
+	{
+		if (checkField(type, HELP))
+			return help();
+		bool local = false;
+		bool recursive = false;
+		bool dir = false;
+		bool master = false;
+
+		if (checkField(type, LOCAL))
+			local = true;
+		if (checkField(type, RECURSIVE))
+			recursive = true;
+		if (checkField(type, MASTER_DIR))
+			master = dir = true;
+		else if (checkField(type, DIR))
+			dir = true;
+		std::cout << "Counting lines of ";
+		if (extensions.size() != 0)
+		{
+			for (auto i : extensions)
+				std::cout << i << " ";
+		}
+		else
+			std::cout << "all ";
+		std::cout << "extensions with";
+		if (!recursive)
+			std::cout << "out";
+		std::cout << "recursion, displaying ";
+		if (dir)
+		{
+			std::cout << "only ";
+			if (master)
+				std::cout << "passed directory totals\n";
+			else
+				std::cout << "directory totals\n";
+		}
+		else
+			std::cout << "all files and directory totals\n";
+		directory ret = count_lines(element, recursive, extensions);
+
+		write(std::cout, ret, master, dir);
+		if (!local)
+		{
+			auto p = element;
+			if (fs::is_directory(element))
+				p /= p.stem().string() + ".lin";
+			else if (fs::is_regular_file(element))
+				p.replace_extension(".lin");
+			std::ofstream out(p);
+
+			lines::write(out, ret, master, dir);
+		}
+	}
+
 }
