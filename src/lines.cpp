@@ -195,7 +195,7 @@ namespace lines
 
 	void lines::execute(mode type, std::vector<std::string>& extensions, path element)
 	{
-		if (checkField(type, HELP))		// if help, display and exit
+		if (type == HELP)		// if help, display and exit
 			return help();
 		bool local = false;   // display only
 		bool recursive = false; // recursive counting
@@ -254,7 +254,7 @@ namespace lines
 	path parse(int argc, char* argv[], mode& out, std::vector<std::string>& extensions)
 	{
 		int argexp = 1;  
-
+		LOG("init argexp " << argexp);
 		if(argc > argexp) // help command
 			if (argv[argexp] == std::string("?"))
 			{
@@ -268,28 +268,28 @@ namespace lines
 				out = LOCAL;
 				++argexp;
 			}
-
+		LOG("local argexp " << argexp);
 		if (argc > argexp) // has recursive switch been set
 			if (argv[argexp] == std::string("-r"))
 			{
 				out |= RECURSIVE;
 				++argexp;
 			}
-
+		LOG("recursive argexp " << argexp);
 		if (argc > argexp) // has master directory only switch been set
 			if (argv[argexp] == std::string("-m"))
 			{
 				out |= MASTER_DIR;
 				++argexp;
 			}
-
+		LOG("dir argexp " << argexp);
 		if (argc > argexp) // has directory only switch been set
 			if (argv[argexp] == std::string("-d"))
 			{
 				out |= DIR;
 				++argexp;
 			}
-
+		LOG("master argexp " << argexp);
 		if (argc > argexp) // hase extensions constraints been set
 			if (argv[argexp] == std::string("-e"))
 			{
@@ -307,9 +307,11 @@ namespace lines
 
 		std::string file = "";
 
+		LOG("extensions argexp " << argexp);
+		file += argv[argexp++];
 		for (argexp; argexp < argc; ++argexp)
 			file += std::string(" ") + argv[argexp]; // concatanate arguments after last switch
-
+		LOG(file);
 		auto filep(path(std::move(file)));
 
 		if (!fs::exists(filep)) // if filesystem element does not exist throw exception
