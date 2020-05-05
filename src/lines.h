@@ -109,6 +109,14 @@ namespace lines
 	};
 
 
+	//function to check if specific bitfields are high
+	template<class enumT>
+	inline bool checkField(enumT in, enumT field) noexcept
+	{
+		return ((in | field) == in);
+	}
+
+
 	//encapsulates directory information including sub-directories
 	struct directory
 	{
