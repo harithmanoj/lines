@@ -108,6 +108,11 @@ namespace lines
 		MASTER_DIR = DIR + 0x10 // master directory only output
 	};
 
+	inline mode& operator |= (mode& lhs, const mode& rhs) noexcept
+	{
+		lhs = static_cast<mode>(static_cast<unsigned char>(lhs)
+			| static_cast<unsigned char>(rhs));
+	}
 
 	//function to check if specific bitfields are high
 	template<class enumT>
@@ -195,8 +200,8 @@ namespace lines
 	void write(std::ostream& out, const directory& dir, bool master = false, bool dir_only = false);
 
 
-
-	path parse(std::string cmd, mode& out, std::vector<std::string>& extensions);
+	// parse command recieved and converts to mode, extensions and path
+	path parse(int argc, char* argv[], mode& out, std::vector<std::string>& extensions);
 
 
 	//executes according to mode indicatd by type
