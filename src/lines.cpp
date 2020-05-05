@@ -155,7 +155,7 @@ namespace lines
 
 	// Write directory name, lines counted etc for the given file and all elements
 	//(depth means depth in the filesystem from passed path)
-	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0)
+	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0, bool dir_only = false)
 	{
 		std::string intendation(depth, '\t');
 
@@ -163,19 +163,25 @@ namespace lines
 		out << intendation << "\tTotal lines : " << dir.current.total << "\n";
 		out << intendation << "\tCode lines : " << dir.current.stripped << "\n\n";
 
-		for (auto& i : dir.files)
-			write_to_stream(out, i, depth + 1);
+		if (!dir_only)
+			for (auto& i : dir.files)
+				write_to_stream(out, i, depth + 1);
 
 		for (auto& i : dir.dirs)
-			write_to_stream(out, *i, depth + 1);
+			write_to_stream(out, *i, depth + 1, dir_only);
 	}
 
-	void lines::write(std::ostream& out, const directory& dir)
+	void write(std::ostream& out, const directory& dir, bool master, bool dir_only)
 	{
 		if (dir.dirs.size() == 0 && dir.files.size() == 0)
 			write_to_stream(out, dir.current);
+		else if (master)
+		{
+			directory ps{ dir.current,{},{} };
+			write_to_stream(out, ps, 0, true);
+		}
 		else
-			write_to_stream(out, dir);
+			write_to_stream(out, dir, 0, dir_only);
 	}
 
 	void directory::add_file(path file)
