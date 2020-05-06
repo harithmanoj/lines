@@ -57,7 +57,7 @@ namespace fs = std::filesystem;
 namespace lines
 {
 
-	const constexpr char* version_lines = "v1.1.2";
+	const constexpr char* version_lines = "v1.2.3";
 	using fs::path;
 
 	//struct for pairing line count with comments and without comments
@@ -79,7 +79,60 @@ namespace lines
 		}
 	};
 
+	inline void banner()
+	{
+		std::cout << "\n-----------------------------------------------------------------------------\n";
+		std::cout << "\n\nProgram to count lines\n\n";
+		std::cout << " \t\t Open source project hosted at github\n\n";
+		std::cout << " \t\t\tVersion " << version_lines << "\n";
+		std::cout << "\n-----------------------------------------------------------------------------\n";
+	}
 
+	inline void help()
+	{
+		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
+			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
+			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
+			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
+			<< " lines -m [dir / file] : counts according to if -r is set or not, but outputs the total only\n"
+			<< " lines -d [dir / file] : counts according to if -r is set or not, but outputs the"
+			<< " totals of each directory\n"
+			<< " lines ? : display this message\n"
+			<< " switches can be mixed in the order : -l, -r, -m, -d, -e\n"
+			<< " order : lines [-l] [-r] [-m] [-d] [-e] [ext] [file / directory]\n\n";
+	}
+
+	// To identify which all switches were passed
+	enum mode : unsigned char
+	{
+		HELP = 0x00, //help
+		LOCAL = 0x01, //local
+		EXTENSIONS = 0x02, // extensions
+		RECURSIVE = 0x04, // recursive
+		DIR = 0x8, // directory only output
+		MASTER_DIR = DIR + 0x10 // master directory only output
+	};
+
+	inline mode& operator |= (mode& lhs, const mode& rhs) noexcept
+	{
+		lhs = static_cast<mode>(static_cast<unsigned char>(lhs)
+			| static_cast<unsigned char>(rhs));
+		return lhs;
+	}
+
+	inline mode& operator |= (mode& lhs, mode&& rhs) noexcept
+	{
+		lhs = static_cast<mode>(static_cast<unsigned char>(lhs)
+			| static_cast<unsigned char>(rhs));
+		return lhs;
+	}
+
+	//function to check if specific bitfields are high
+	template<class enumT>
+	inline bool checkField(enumT in, enumT field) noexcept
+	{
+		return ((in | field) == in);
+	}
 
 	//encapsulates directory information including sub-directories
 	struct directory
@@ -111,7 +164,7 @@ namespace lines
 			}
 		}
 
-		directory& operator = (const directory& in) 
+		directory& operator = (const directory& in)
 		{
 			current = in.current;
 			files = in.files;
@@ -148,7 +201,8 @@ namespace lines
 		}
 	};
 
-	
+
+
 	// get file structure of element, if directory gets subdirectory if recursive is true
 	// if file directory::files and directory::dirs is empty
 	// if no recursive directory::dirs is empty
@@ -156,110 +210,16 @@ namespace lines
 	directory count_lines(path element, bool recursive, std::vector<std::string> extensions);
 
 	// Write to file generalized function
-	void write(std::ostream& out, const directory& dir);
+	void write(std::ostream& out, const directory& dir, bool master = false, bool dir_only = false);
 
-	/*
-	// Find line count of specified file
-	unsigned long find_length(path file)
-	{
-		unsigned long ret = 0;
 
-		// if not file throw error
-		if (!fs::is_regular_file(file))
-			throw std::invalid_argument("not regular file");
+	// parse command recieved and converts to mode, extensions and path
+	path parse(int argc, char* argv[], mode& out, std::vector<std::string>& extensions);
 
-		std::ifstream in(file);
 
-		std::string st;
-		std::getline(in, st);
-		while (!in.eof()) //till end of file
-		{
-			if (st.find_first_not_of(" \t\n\v\f\r") != std::string::npos)
-				++ret; // if line is not only whitespace
-			std::getline(in, st);
-		}
-		return ret;
-	}
-
-	// get total lines for all files in the directory.
-	unsigned long long all_files(path directory, std::vector<std::string> permitted, bool rec = false)
-	{
-		unsigned long long ret = 0;
-
-		if (!fs::is_directory(directory))
-		{
-			if (!fs::is_regular_file(directory))
-				throw std::invalid_argument("not directory nor file");
-			else
-				return find_length(directory);
-		}
-
-		if (!rec)
-		{
-			if (permitted.size() == 0)
-				for (auto& p : fs::directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-						ret += find_length(file);
-				}
-			else
-				for (auto& p : fs::directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-					{
-						if ((std::find(permitted.begin(), permitted.end(), file.extension())
-							!= permitted.end()))
-						{
-							ret += find_length(file);
-						}
-					}
-				}
-		}
-		else
-		{
-			if (permitted.size() == 0)
-				for (auto& p : fs::recursive_directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-						ret += find_length(file);
-				}
-			else
-				for (auto& p : fs::recursive_directory_iterator(directory))
-				{
-					auto& file = p.path();
-					if (fs::is_regular_file(file))
-					{
-						if ((std::find(permitted.begin(), permitted.end(), file.extension())
-							!= permitted.end()))
-						{
-							ret += find_length(file);
-						}
-					}
-				}
-		}
-		return ret;
-	}
-	*/
-	inline void banner()
-	{
-		std::cout << "\n-----------------------------------------------------------------------------\n";
-		std::cout << "\n\nProgram to count lines\n\n";
-		std::cout << " \t\t Open source project hosted at github\n\n";
-		std::cout << " \t\t\tVersion " << version_lines << "\n";
-		std::cout << "\n-----------------------------------------------------------------------------\n";
-	}
-
-	inline void help()
-	{
-		std::cout << "lines [directory / filename] : counts line in file / dir outputs to display and line_total.lin\n"
-			<< " lines -l [directory / filename] : counts line in file / dir and displays it\n"
-			<< " lines -e [ext] [dir / file] : counts line in file that has extensions in [ext]\n"
-			<< " lines -r [dir / file] : counts lines of all files in directory and sub directory\n"
-			<< " switches can be mixed in the order : -l, -r, -e\n\n";
-	}
+	//executes according to mode indicatd by type
+	void execute(mode type, std::vector<std::string>& extensions, path element);	
+	
 
 }
 
