@@ -26,16 +26,16 @@
 namespace lines
 {
 	//checks if string can be added to stripped count, checks if comment starts or stops there
-	bool check_string(const std::string& in, LineCount& info, bool prev_state)
+	bool checkString(const std::string& in, LineCount& info, bool prevState)
 	{
 		auto beg = in.find_first_not_of(" \t\n\v\f\r"); //begining discarding whitespace
 		auto end = in.find_last_not_of(" \t\n\v\f\r"); //ending discarding whitespace
 		++info.total; //total line is incremented either way
 
 		if (beg == std::string::npos)
-			return prev_state;
+			return prevState;
 
-		if (prev_state) //if multi line comment is active
+		if (prevState) //if multi line comment is active
 		{
 			auto previous_comment_end = in.find_first_of('*'); // find end of comment
 			auto prev_cmnt_end = in.find_first_of('/', previous_comment_end);
@@ -80,7 +80,7 @@ namespace lines
 	}
 
 	//counts total lines in a file
-	void count_file_lines(LineCount& count)
+	void countFileLines(LineCount& count)
 	{
 		if (count.component.empty())
 			throw std::invalid_argument("empty path");
@@ -95,20 +95,20 @@ namespace lines
 		std::getline(file, input);
 		while (!file.eof()) // till end of file
 		{
-			comment = check_string(input, count, comment); //check if comment has been opened / closed, update counts
+			comment = checkString(input, count, comment); //check if comment has been opened / closed, update counts
 			std::getline(file, input); // get next line
 		}
 		LOG(count.total << " " << count.stripped);
 	}
 
 	
-	lines::directory lines::count_lines(path element, bool recursive, std::vector<std::string> extensions)
+	lines::directory lines::countLines(path element, bool recursive, std::vector<std::string> extensions)
 	{
 		//directory to return
 		directory ret{ {element,0,0},{},{} };
 		if (fs::is_regular_file(element))
 		{
-			count_file_lines(ret.current);
+			countFileLines(ret.current);
 			return ret; // only file
 		}
 		if (fs::is_directory(element)) // if directory
@@ -121,9 +121,9 @@ namespace lines
 				if (recursive) //add directory only if recursive
 					if (fs::is_directory(element_path))
 					{
-						auto t = count_lines(element_path, true, extensions);
+						auto t = countLines(element_path, true, extensions);
 						if (t.files.size() != 0 || t.dirs.size() != 0) // add directory only if 
-							ret.add_dirs(std::move(t)); //it has sub directories or files 
+							ret.addDirectory(std::move(t)); //it has sub directories or files 
 															//that satisfy conditions
 					}
 
@@ -136,7 +136,7 @@ namespace lines
 							element_path.extension()) != extensions.end());
 					if (reg) // only add if extensions is empty or file extension
 					{			// is present in extensions vector
-						ret.add_file(element_path);
+						ret.addFile(element_path);
 					}
 				}
 			}
@@ -146,7 +146,7 @@ namespace lines
 
 	// Write filename, lines counted etc for the given file 
 	//(depth means depth in the filesystem from passed path)
-	void write_to_stream(std::ostream& out, const LineCount& file, unsigned depth = 0)
+	void writeToStream(std::ostream& out, const LineCount& file, unsigned depth = 0)
 	{
 		std::string intendation(depth, '\t');
 		LOG(" writing " + file.component.filename().string());
@@ -157,38 +157,38 @@ namespace lines
 
 	// Write directory name, lines counted etc for the given file and all elements
 	//(depth means depth in the filesystem from passed path)
-	void write_to_stream(std::ostream& out, const directory& dir, unsigned depth = 0, bool dir_only = false)
+	void writeToStream(std::ostream& out, const directory& dir, unsigned depth = 0, bool dirOnly = false)
 	{
 		std::string intendation(depth, '\t');
 		out << intendation << "directory : " << dir.current.component.stem().string() << "\n";
 		out << intendation << "\tTotal lines : " << dir.current.total << "\n";
 		out << intendation << "\tCode lines : " << dir.current.stripped << "\n\n";
 
-		if (!dir_only) // write files only if dir_only is not set
+		if (!dirOnly) // write files only if dirOnly is not set
 			for (auto& i : dir.files)
-				write_to_stream(out, i, depth + 1);
+				writeToStream(out, i, depth + 1);
 
 		for (auto& i : dir.dirs)
-			write_to_stream(out, *i, depth + 1, dir_only);
+			writeToStream(out, *i, depth + 1, dirOnly);
 	}
 
-	void write(std::ostream& out, const directory& dir, bool master, bool dir_only)
+	void write(std::ostream& out, const directory& dir, bool master, bool dirOnly)
 	{
 		if (dir.dirs.size() == 0 && dir.files.size() == 0)
-			write_to_stream(out, dir.current);
+			writeToStream(out, dir.current);
 		else if (master) // if master is set write only root totals
 		{
 			directory ps{ dir.current,{},{} };
-			write_to_stream(out, ps, 0, true);
+			writeToStream(out, ps, 0, true);
 		}
 		else
-			write_to_stream(out, dir, 0, dir_only);
+			writeToStream(out, dir, 0, dirOnly);
 	}
 
-	void directory::add_file(path file)
+	void directory::addFile(path file)
 	{
 		LineCount in{ file,0,0 };
-		count_file_lines(in); //count lines in file
+		countFileLines(in); //count lines in file
 		current += in; // add it to directory totals
 		files.push_back(in);
 	}
@@ -235,7 +235,7 @@ namespace lines
 			std::cout << "all files and directory totals\n";
 
 		LOG("start counting");
-		directory ret = count_lines(element, recursive, extensions); //count lines from directory
+		directory ret = countLines(element, recursive, extensions); //count lines from directory
 		LOG("end counting");
 		write(std::cout, ret, master, dir); // write to display
 		if (!local) // if not local, write to file

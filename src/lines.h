@@ -57,7 +57,7 @@ namespace fs = std::filesystem;
 namespace lines
 {
 
-	const constexpr char* version_lines = "v1.2.3";
+	const constexpr char* versionLines = "v1.2.3";
 	using fs::path;
 
 	//struct for pairing line count with comments and without comments
@@ -84,7 +84,7 @@ namespace lines
 		std::cout << "\n-----------------------------------------------------------------------------\n";
 		std::cout << "\n\nProgram to count lines\n\n";
 		std::cout << " \t\t Open source project hosted at github\n\n";
-		std::cout << " \t\t\tVersion " << version_lines << "\n";
+		std::cout << " \t\t\tVersion " << versionLines << "\n";
 		std::cout << "\n-----------------------------------------------------------------------------\n";
 	}
 
@@ -185,13 +185,13 @@ namespace lines
 			return *this;
 		}
 
-		void add_dirs(directory&& in)
+		void addDirectory(directory&& in)
 		{
 			current += in.current;
 			dirs.push_back(new directory(std::move(in)));
 		}
 
-		void add_file(path file);
+		void addFile(path file);
 
 		~directory()
 		{
@@ -207,10 +207,10 @@ namespace lines
 	// if file directory::files and directory::dirs is empty
 	// if no recursive directory::dirs is empty
 	// also count lines in each file and add it to the structure
-	directory count_lines(path element, bool recursive, std::vector<std::string> extensions);
+	directory countLines(path element, bool recursive, std::vector<std::string> extensions);
 
 	// Write to file generalized function
-	void write(std::ostream& out, const directory& dir, bool master = false, bool dir_only = false);
+	void write(std::ostream& out, const directory& dir, bool master = false, bool dirOnly = false);
 
 
 	// parse command recieved and converts to mode, extensions and path
