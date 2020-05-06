@@ -219,7 +219,7 @@ namespace lines
 		}
 		else
 			std::cout << "all ";
-		std::cout << "extensions with";
+		std::cout << "extensions with ";
 		if (!recursive)
 			std::cout << "out";
 		std::cout << "recursion, displaying ";
