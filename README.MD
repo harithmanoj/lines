@@ -7,6 +7,8 @@ It also displays comment and white-space stripped line count, (strips c++ style 
 
 It is released under [GPL License](License.md).
 
+The branch master contains last release code, for latest bugfixes, features see develop branch.
+
 Build lines
 -------------------------------------------------------------------------------
 
